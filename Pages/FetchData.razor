@@ -1,0 +1,70 @@
+﻿@page "/fetchdata"
+@using WebSql.Data  
+
+<PageTitle>Youtube Songs</PageTitle>
+
+<h1>Youtube Songs</h1>
+
+@if (videoList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Song name</th>
+                <th>Url</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (videoList.Count == 0)
+            {
+                <p><em>No records found.</em></p>
+            }
+            else
+            {
+                @foreach (YT video in videoList)
+                {
+                    <tr>
+                        <td>@video.Id</td>
+                        <td>@video.Song</td>
+                        <td><a href=@video.Video>@video.Video</a></td>
+                        <td><button class="btn btn-outline-light" @onclick="() => DeleteVideo(video)">Delete</button> </td>
+                    </tr>
+                }
+            }
+
+        </tbody>
+
+        <div class="TextInput">
+            <input type="text" @bind="yt.Song" placeholder="Song name" />
+            <input type="text" @bind="yt.Video" placeholder="Url" />
+            <button class="btn btn-outline-light" @onclick="AddVideo">Add</button>
+        </div>
+
+    </table>
+}
+
+@code {
+    YT yt = new();
+    List<YT> videoList = Sql.Load();
+
+
+    private void AddVideo()
+    {
+        Sql.Insert(yt);
+        videoList = Sql.Load();
+        // Clear out the text box when a new video is added
+        yt.Song = string.Empty;
+        yt.Video = string.Empty; 
+    }
+
+    private void DeleteVideo(YT yt)
+    {
+        Sql.Delete(yt);
+        videoList = Sql.Load();
+    }
+}
